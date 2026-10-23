@@ -1,0 +1,3 @@
+# STAGING - the site is not public yet. scripts/go-live.mjs swaps this for robots.live.txt
+User-agent: *
+Disallow: /
