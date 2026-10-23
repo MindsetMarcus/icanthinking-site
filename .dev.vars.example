@@ -1,0 +1,2 @@
+MAILERLITE_API_KEY=your-test-key
+MAILERLITE_GROUPS={"default":"000000"}
