@@ -1,0 +1,7 @@
+/* long-form legal pages */
+.prose h2{font-size:1.3rem;margin-top:2.4rem}
+.prose ul{margin:1rem 0 0;padding-left:1.3rem;color:var(--muted);font-size:1.05rem}
+.prose li{margin-top:.55rem}
+.prose li::marker{color:var(--coral)}
+.prose strong{color:var(--fg)}
+.prose a{color:var(--c-found)}
