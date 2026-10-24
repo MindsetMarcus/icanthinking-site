@@ -26,7 +26,7 @@ export async function onRequestPost({ request, env }) {
 
   const name = String(b.name || '').trim().slice(0, 80);
   const email = String(b.email || '').trim().toLowerCase().slice(0, 200);
-  const goal = String(b.goal || '').slice(0, 120);
+  const goal = String(b.goal || '').slice(0, 300);
   const source = /^[a-z0-9-]{1,40}$/.test(String(b.source || '')) ? b.source : 'default';
   if (!name) return json({ error: 'invalid', message: 'Please add your first name.' }, 422);
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ error: 'invalid', message: 'Please check your email address.' }, 422);
