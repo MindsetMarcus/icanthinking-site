@@ -5,8 +5,8 @@
   "version": "1.0.0",
   "description": "iCan Thinking website (static, for Cloudflare Pages)",
   "scripts": {
-    "dev": "wrangler pages dev ./public",
-    "deploy": "wrangler pages deploy ./public --project-name icanthinking",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
     "go-live": "node scripts/go-live.mjs"
   },
   "devDependencies": { "wrangler": "^4.0.0" }

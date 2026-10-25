@@ -6,6 +6,7 @@ Typeface is Comfortaa, self-hosted. No cookies, so no cookie banner is needed.
 ```
 public/      the website (this is what Cloudflare serves)
 functions/   api/subscribe.js - the sign-up form handler
+worker/      index.js - serves the site and routes /api/subscribe to the handler
 scripts/     go-live.mjs - switches from staging to live
 ```
 
@@ -14,21 +15,21 @@ scripts/     go-live.mjs - switches from staging to live
 The site starts in **staging mode**: every page is sent with `noindex`, and robots.txt blocks crawlers. Nothing can appear in Google until you go live.
 
 **Option A - GitHub (recommended, updates itself)**
-1. Create a free Cloudflare account and a private GitHub repo, then push this folder to it.
-2. Cloudflare dashboard > Workers & Pages > Create > Pages > Connect to Git. Pick the repo.
-3. Framework preset: None. Build command: leave empty. Build output directory: `public`.
-4. Deploy. You get a `something.pages.dev` address to review the site on.
+1. Push this folder to a private GitHub repo.
+2. Cloudflare dashboard > Workers & Pages > Create > Import a repository. Pick the repo.
+3. Project name `icanthinking-site` (it must match `name` in `wrangler.toml`). Build command: leave empty. Deploy command: `npx wrangler deploy`. Root directory: leave empty.
+4. Deploy. You get a `something.workers.dev` address to review the site on. Every later change on GitHub redeploys automatically.
 
 **Option B - upload from your computer**
 1. Install Node.js, then in this folder run `npm install` and `npx wrangler login`.
-2. Run `npm run deploy`. The first time it asks to create the project, name it `icanthinking`.
+2. Run `npm run deploy`.
 
 ## 2. Turn on sign-ups
 
 1. Create a MailerLite account (or tell us if you prefer another provider and the function can be changed).
 2. MailerLite > Integrations > API > create a token.
 3. Make a group for each list you want, for example "iCan Start" and one per waitlist. Note each group ID.
-4. In Cloudflare: your Pages project > Settings > Variables and Secrets (Production and Preview):
+4. In Cloudflare: your project > Settings > Variables and Secrets:
    - `MAILERLITE_API_KEY` (as a Secret): the token
    - `MAILERLITE_GROUPS` (text): `{"default":"111","start":"111","waitlist-lead":"222","waitlist-speak":"333","waitlist-sell":"444","waitlist-wealth":"555"}`
 5. Redeploy, then test with your own email. Until the key is added the form shows an honest "not switched on yet" message instead of pretending it worked.
@@ -37,7 +38,7 @@ The function has not yet been run against a live MailerLite account, so please t
 
 ## 3. Connect icanthinking.com
 
-1. Pages project > Custom domains > add `icanthinking.com` and `www.icanthinking.com`.
+1. Project > Settings > Domains & Routes > Add > Custom domain: add `icanthinking.com` and `www.icanthinking.com`.
 2. If the domain is not on Cloudflare yet, add it (Add a site) and change the nameservers at your registrar to the two Cloudflare ones. Before you do, copy across every DNS record you already use.
    **Keep the existing `app` record** (app.icanthinking.com) exactly as it is, plus any MX/email records, or the app and email will stop working.
 3. Add a redirect from www to the main address: Rules > Redirect Rules > `www.icanthinking.com/*` to `https://icanthinking.com/$1` (301).
@@ -69,4 +70,3 @@ It refuses to run while placeholders remain. When it passes it removes the noind
 
 ## Local preview
 `npm install` then `npm run dev` (add a `.dev.vars` file, see `.dev.vars.example`, to test the form).
-
