@@ -4,10 +4,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
-  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
-  # STAGING-ONLY-START
-  X-Robots-Tag: noindex, nofollow
-  # STAGING-ONLY-END
+  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; connect-src 'self'; form-action 'self'; frame-src https://bookings.marcusthomlinson.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
 
 /assets/css/*
   Cache-Control: public, max-age=31536000, immutable
