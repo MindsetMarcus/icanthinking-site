@@ -8,11 +8,34 @@
 //                                 {"default":"123","start":"123","waitlist-lead":"456"}
 //   MAILERLITE_GOAL_FIELD (text, optional) name of a custom text field to hold the "What brings you here?" answer
 //   ALLOWED_ORIGINS     (text, optional) comma list; defaults to the site's own origin
+//   RESEND_API_KEY      (secret, optional) lets the site email you each time someone joins
+//   NOTIFY_TO           (text, optional) who gets the notification; defaults to info@icanthinking.com
+//   NOTIFY_FROM         (text, optional) sender; defaults to "iCan Thinking <hello@icanthinking.com>"
 
 const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 
-export async function onRequestPost({ request, env }) {
+
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// Emails you when someone joins. Never blocks or breaks the sign-up if it fails.
+async function notify(env, { name, email, goal, source, isNew }) {
+  if (!env.RESEND_API_KEY) return;
+  const to = env.NOTIFY_TO || 'info@icanthinking.com';
+  const from = env.NOTIFY_FROM || 'iCan Thinking <hello@icanthinking.com>';
+  const where = source === 'start' ? 'iCan Start (the website sign-up)' : source;
+  const html = `<p><strong>${isNew ? 'New subscriber' : 'Existing subscriber signed up again'}</strong></p>` +
+    `<p>Name: ${esc(name)}<br>Email: ${esc(email)}<br>What brings them here: ${esc(goal || 'not given')}<br>Joined via: ${esc(where)}</p>`;
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + env.RESEND_API_KEY },
+      body: JSON.stringify({ from, to: [to], subject: `${isNew ? 'New sign-up' : 'Repeat sign-up'}: ${name} (${where})`, html }),
+    });
+  } catch { /* ignore */ }
+}
+
+export async function onRequestPost({ request, env, ctx }) {
   const origin = request.headers.get('Origin');
   const self = new URL(request.url).origin;
   const allowed = (env.ALLOWED_ORIGINS ? env.ALLOWED_ORIGINS.split(',').map(s => s.trim()) : [self]);
@@ -56,7 +79,11 @@ export async function onRequestPost({ request, env }) {
   } catch {
     return json({ error: 'upstream', message: 'Sorry, something went wrong on our side. Please try again in a moment.' }, 502);
   }
-  if (r.status === 200 || r.status === 201) return json({ ok: true });
+  if (r.status === 200 || r.status === 201) {
+    const job = notify(env, { name, email, goal, source, isNew: r.status === 201 });
+    if (ctx && ctx.waitUntil) ctx.waitUntil(job); else await job;
+    return json({ ok: true });
+  }
   if (r.status === 422) return json({ error: 'invalid', message: 'That email address was not accepted. Please check it and try again.' }, 422);
   return json({ error: 'upstream', message: 'Sorry, something went wrong on our side. Please try again in a moment.' }, 502);
 }
