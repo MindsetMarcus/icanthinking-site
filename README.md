@@ -68,5 +68,12 @@ It refuses to run while placeholders remain. When it passes it removes the noind
 - Security headers and a strict Content Security Policy in `public/_headers`
 - Friendly short links in `public/_redirects` (for example `/foundation`)
 
+## Blog
+Posts live in `content/blog/` as one file each (`.md`, or `.html` for hand-written HTML). To publish:
+1. Add or edit a file in `content/blog/` (the header at the top of `scripts/build-blog.mjs` shows the format).
+2. Run `node scripts/build-blog.mjs`. It rebuilds `public/blog/`, the Blog menu link, `sitemap.xml` and `llms.txt`.
+3. Commit and push. Cloudflare deploys it.
+The generated files in `public/` are committed, because Cloudflare does not run a build step here.
+
 ## Local preview
 `npm install` then `npm run dev` (add a `.dev.vars` file, see `.dev.vars.example`, to test the form).
