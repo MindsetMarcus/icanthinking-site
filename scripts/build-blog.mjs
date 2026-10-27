@@ -12,6 +12,8 @@
 //   tag: Emotional mastery
 //   description: One or two sentences for Google and social sharing (about 150 characters)
 //   excerpt: (optional) the text on the blog index card; defaults to the description
+//   image: (optional) name of an illustration in public/assets/img/blog/ without the extension (needs a .svg and a 1200x630 .png)
+//   image_alt: (optional) a short description of the image for screen readers
 //   byline: (optional) replaces "By Marcus Thomlinson", for example "A coaching story"
 //   disclaimer: true           (optional) adds the "not medical advice" note
 //   author_box: false          (optional) hides the "About Marcus" box
@@ -102,11 +104,14 @@ function readPost(file) {
   const check = meta.title + ' ' + (meta.subtitle || '') + ' ' + meta.description + ' ' + (meta.excerpt || '') + ' ' + plain(body);
   if (/[—–]/.test(check)) fail(`${name} contains a long dash. Use a hyphen or reword (house style).`);
   if (/ICANN/.test(check)) fail(`${name} says "ICANN". The brand is spelled "iCan" / "iCan Thinking".`);
+  if (meta.image) for (const ext of ['svg', 'png']) if (!fs.existsSync(path.join(PUBLIC, 'assets', 'img', 'blog', `${meta.image}.${ext}`))) fail(`${name}: image "${meta.image}.${ext}" not found in public/assets/img/blog/.`);
+  if (meta.image && !meta.image_alt) fail(`${name}: add an image_alt: line describing the image.`);
   const words = plain(body).split(/\s+/).length;
   return {
     slug, body, words,
     title: meta.title, subtitle: meta.subtitle || '', date: meta.date || '', tag: meta.tag,
     description: meta.description, excerpt: meta.excerpt || meta.description,
+    image: meta.image || '', imageAlt: meta.image_alt || '',
     byline: meta.byline || 'By Marcus Thomlinson',
     disclaimer: meta.disclaimer === 'true', authorBox: meta.author_box !== 'false',
     mins: Math.max(1, Math.round(words / 200)),
@@ -150,7 +155,7 @@ fs.writeFileSync(path.join(cssDir, `blog.${hash}.css`), css);
 const blogCss = `<link rel="stylesheet" href="/assets/css/blog.${hash}.css">`;
 
 // ---------- 3. page templates ----------
-function page({ title, description, url, bodyHtml, jsonld, ogType }) {
+function page({ title, description, url, bodyHtml, jsonld, ogType, ogImage = '/assets/img/og-image.png' }) {
   return `<!doctype html>
 <html lang="en-GB">
 <head>
@@ -169,11 +174,12 @@ function page({ title, description, url, bodyHtml, jsonld, ogType }) {
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${url}">
-<meta property="og:image" content="${SITE}/assets/img/og-image.png">
+<meta property="og:image" content="${SITE}${ogImage}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="iCan Thinking. Small daily wins. Big life changes.">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${SITE}${ogImage}">
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
@@ -194,7 +200,7 @@ ${siteJs || ''}
 `;
 }
 
-const cardHtml = p => `<li><a class="blog-card" href="/blog/${p.slug}/"><span class="tag">${esc(p.tag)}</span><h3>${esc(p.title)}</h3><p>${esc(p.excerpt)}</p><span class="foot"><span>${p.date ? fmtDate(p.date) : 'From the archive'}</span><span>${p.mins} min read</span><span class="go">Read more &rarr;</span></span></a></li>`;
+const cardHtml = p => `<li><a class="blog-card" href="/blog/${p.slug}/">${p.image ? `<img class="blog-card-img" src="/assets/img/blog/${p.image}.svg" alt="" width="1200" height="630" loading="lazy">` : ''}<span class="tag">${esc(p.tag)}</span><h3>${esc(p.title)}</h3><p>${esc(p.excerpt)}</p><span class="foot"><span>${p.date ? fmtDate(p.date) : 'From the archive'}</span><span>${p.mins} min read</span><span class="go">Read more &rarr;</span></span></a></li>`;
 
 const showFounding = TODAY < FOUNDING_ENDS;
 const cta = `<aside class="blog-cta" aria-labelledby="cta-title">
@@ -223,6 +229,7 @@ ${p.subtitle ? `<p class="sub">${esc(p.subtitle)}</p>` : ''}
 <ul class="meta">${meta}</ul>
 </div></section>
 <section class="sec"><div class="wrap blog-wrap"><article class="post">
+${p.image ? `<figure class="post-hero"><img src="/assets/img/blog/${p.image}.svg" alt="${esc(p.imageAlt)}" width="1200" height="630"></figure>` : ''}
 ${p.body}
 ${p.disclaimer ? `<aside class="post-note"><strong>A quick note:</strong> ${esc(DISCLAIMER.replace(/^This post is for general information and inspiration\. /, 'this post is for general information and inspiration. '))}</aside>` : ''}
 ${cta}
@@ -238,7 +245,7 @@ ${others.length ? `<section class="sec alt"><div class="wrap"><h2>More from the 
         ...(p.date ? { datePublished: p.date } : {}),
         author: { '@type': 'Person', '@id': `${SITE}/about-marcus/#marcus`, name: 'Marcus Thomlinson' },
         publisher: { '@id': `${SITE}/#organization` },
-        image: `${SITE}/assets/img/og-image.png`,
+        image: `${SITE}${p.image ? `/assets/img/blog/${p.image}.png` : '/assets/img/og-image.png'}`,
       },
       {
         '@type': 'BreadcrumbList',
@@ -252,7 +259,7 @@ ${others.length ? `<section class="sec alt"><div class="wrap"><h2>More from the 
   };
   const dir = path.join(blogDir, p.slug);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'index.html'), page({ title: `${p.title} | iCan Thinking`, description: p.description, url, bodyHtml, jsonld, ogType: 'article' }));
+  fs.writeFileSync(path.join(dir, 'index.html'), page({ title: `${p.title} | iCan Thinking`, description: p.description, url, bodyHtml, jsonld, ogType: 'article', ogImage: p.image ? `/assets/img/blog/${p.image}.png` : undefined }));
 }
 
 const indexBody = `<section class="band blog-hero"><div class="wrap">

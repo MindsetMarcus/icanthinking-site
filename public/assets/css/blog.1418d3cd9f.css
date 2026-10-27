@@ -52,3 +52,7 @@
 
 .blog-cta .btn-ghost { border-color: var(--band-fg); color: var(--band-fg); background: transparent; }
 .blog-cta .eyebrow { color: var(--band-muted); }
+
+.post-hero { margin: 0 0 2.2em; }
+.post-hero img { width: 100%; height: auto; border-radius: 20px; }
+.blog-card-img { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.1rem; }
