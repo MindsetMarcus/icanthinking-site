@@ -56,3 +56,20 @@
 .post-hero { margin: 0 0 2.2em; }
 .post-hero img { width: 100%; height: auto; border-radius: 20px; }
 .blog-card-img { width: 100%; height: auto; border-radius: 12px; margin-bottom: 1.1rem; }
+
+/* video (click to play) */
+.video { margin: 0 0 2.2em; }
+.video-box { position: relative; display: block; aspect-ratio: 16 / 9; border-radius: 20px; overflow: hidden; background: var(--ink); text-decoration: none; }
+.video-box img { width: 100%; height: 100%; object-fit: cover; }
+.video-box iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.video-play { position: absolute; inset: 0; display: grid; place-items: center; }
+.video-play svg { width: 84px; height: 84px; filter: drop-shadow(0 6px 18px rgba(0,0,0,.45)); transition: transform .18s ease; }
+.video-play circle { fill: var(--accent); }
+.video-play path { fill: #fff; }
+.video-box:hover .video-play svg { transform: scale(1.08); }
+.video-box.playing .video-play, .video-box.playing .sr { display: none; }
+.video figcaption { font-size: .85rem; color: var(--muted); margin-top: .7rem; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.post-figure { margin: 2em auto; max-width: 20rem; }
+.post-figure img { width: 100%; height: auto; border-radius: 20px; }
+@media (prefers-reduced-motion: reduce) { .video-play svg { transition: none; } }
