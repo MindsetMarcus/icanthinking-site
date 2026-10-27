@@ -1,4 +1,4 @@
 iCan Thinking site build
-built: 2026-10-26 08:18 UTC
-css: site.04215d7c83.css
+built: 2026-10-27 07:26 UTC
+css: site.373af7e65f.css
 js: site.175283002b.js
