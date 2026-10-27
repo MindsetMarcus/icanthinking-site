@@ -1,0 +1,54 @@
+/* iCan Thinking blog styles. Built on the site's own colour variables, so light and dark mode both work.
+   No inline styles are used anywhere (the site's Content Security Policy forbids them). */
+
+.blog-hero { padding-block: clamp(2.5rem, 7vw, 5rem); }
+.blog-hero .wrap { display: block; max-width: 52rem; }
+.blog-hero h1 { max-width: 22ch; margin: .9rem 0 1rem; }
+.blog-hero .sub { font-size: clamp(1.05rem, 2.2vw, 1.3rem); line-height: 1.55; color: var(--band-accent); margin: 0 0 1.4rem; max-width: 40rem; }
+.blog-hero .meta { display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; list-style: none; margin: 0; padding: 0; font-size: .88rem; color: var(--band-muted); }
+.blog-hero .meta li + li::before { content: "\2022"; color: var(--band-accent); margin-right: 1.2rem; }
+.blog-hero .tag { display: inline-block; background: var(--accent); color: var(--ink); font-weight: 700; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; padding: .35rem .9rem; border-radius: 999px; text-decoration: none; }
+
+.blog-wrap { display: block; max-width: 46rem; }
+.post { font-size: 1.08rem; line-height: 1.85; }
+.post p { margin: 0 0 1.35em; }
+.post h2 { max-width: none; font-size: clamp(1.4rem, 3vw, 1.85rem); line-height: 1.3; margin: 2em 0 .7em; display: flex; gap: .7rem; align-items: baseline; }
+.post h2::before { content: ""; flex: 0 0 .7rem; height: .7rem; border-radius: 50%; background: var(--accent); transform: translateY(-.1rem); }
+.post h3 { font-size: 1.15rem; margin: 1.8em 0 .4em; }
+.post h3::after { content: ""; display: block; width: 2.2rem; height: 3px; border-radius: 3px; background: var(--accent); margin-top: .5rem; }
+.post ul, .post ol { margin: 0 0 1.5em; padding-left: 1.4em; }
+.post li { margin-bottom: .6em; padding-left: .3em; }
+.post li::marker { color: var(--accent); font-weight: 700; }
+.post a { color: var(--fg); text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.post blockquote { margin: 2em 0; padding: 1.2rem 1.5rem; background: var(--accent-soft); color: var(--ink); border-left: 6px solid var(--accent); border-radius: 0 20px 20px 0; font-size: 1.15rem; line-height: 1.6; font-weight: 700; }
+.post blockquote p { margin: 0; }
+.post hr { border: 0; border-top: 2px dashed var(--accent); margin: 2.5em 0; }
+
+.post-note { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem 1.3rem; font-size: .9rem; line-height: 1.7; color: var(--muted); margin: 2.2em 0 0; }
+.post-note strong { color: var(--fg); }
+
+.blog-cta { background: var(--band); color: var(--band-fg); border-radius: 20px; padding: clamp(1.6rem, 5vw, 2.8rem); margin-top: 2.6em; }
+.blog-cta .eyebrow { margin-bottom: .5rem; }
+.blog-cta h2 { display: block; color: var(--band-fg); margin: 0 0 .8rem; max-width: none; }
+.blog-cta h2::before { display: none; }
+.blog-cta p { color: var(--band-muted); margin: 0 0 .8em; }
+.blog-cta .actions { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 1.4rem; }
+.blog-cta .small { font-size: .84rem; margin: 1.2rem 0 0; color: var(--band-accent); }
+
+.post-author { display: flex; gap: 1.1rem; align-items: center; margin-top: 2.4em; padding-top: 1.8em; border-top: 2px dashed var(--accent); font-size: .95rem; line-height: 1.7; }
+.post-author img { flex: 0 0 64px; width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
+.post-author p { margin: 0; }
+
+.blog-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: 1.5rem; list-style: none; margin: 2rem 0 0; padding: 0; }
+.blog-card { display: flex; flex-direction: column; height: 100%; background: var(--panel); border: 1px solid var(--line); border-top: 6px solid var(--accent); border-radius: 20px; padding: 1.6rem 1.5rem; text-decoration: none; color: var(--fg); transition: transform .18s ease; }
+.blog-card:hover { transform: translateY(-4px); }
+.blog-card .tag { align-self: flex-start; background: var(--accent-soft); color: var(--ink); font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: .25rem .75rem; border-radius: 999px; margin-bottom: .9rem; }
+.blog-card h3 { font-size: 1.2rem; line-height: 1.4; margin: 0 0 .7rem; }
+.blog-card p { font-size: .94rem; line-height: 1.7; margin: 0 0 1.1rem; color: var(--muted); }
+.blog-card .foot { margin-top: auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem .8rem; font-size: .82rem; color: var(--muted); }
+.blog-card .go { font-weight: 700; color: var(--fg); }
+
+@media (prefers-reduced-motion: reduce) { .blog-card { transition: none; } }
+
+.blog-cta .btn-ghost { border-color: var(--band-fg); color: var(--band-fg); background: transparent; }
+.blog-cta .eyebrow { color: var(--band-muted); }
