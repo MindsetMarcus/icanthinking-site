@@ -14,13 +14,16 @@
 //   excerpt: (optional) the text on the blog index card; defaults to the description
 //   image: (optional) name of an illustration in public/assets/img/blog/ without the extension (needs a .svg and a 1200x630 .png)
 //   image_alt: (optional) a short description of the image for screen readers
+//   video: (optional) a YouTube video ID. The video shows at the top as a click-to-play picture (the image is used as its cover)
+//   video_title: (needed with video) what the video is called
+//   note: (optional) an extra note shown under the post, for example "Shared with permission"
 //   byline: (optional) replaces "By Marcus Thomlinson", for example "A coaching story"
 //   disclaimer: true           (optional) adds the "not medical advice" note
 //   author_box: false          (optional) hides the "About Marcus" box
 //   ---
 //
 // Then write the post in Markdown: ## headings, ### sub-headings, - bullets, 1. numbered lists,
-// > pull quotes, **bold**, *italic*, [links](https://...).
+// > pull quotes, ![description](/assets/img/blog/pic.webp "577x1024") pictures, {{youtube:VIDEOID|Video title}} for a video part-way down, **bold**, *italic*, [links](https://...).
 //
 // The script then:
 //   - writes public/blog/index.html and public/blog/<slug>/index.html using the site's own header, footer and styles
@@ -59,6 +62,14 @@ function walk(d) {
   });
 }
 
+// ---------- video and pictures ----------
+const PLAY = '<span class="video-play" aria-hidden="true"><svg viewBox="0 0 64 64" width="64" height="64"><circle cx="32" cy="32" r="32"/><path d="M26 19l20 13-20 13z"/></svg></span>';
+function videoHtml(id, title, poster) {
+  if (!/^[\w-]{11}$/.test(id)) fail(`"${id}" does not look like a YouTube video ID (11 characters).`);
+  return `<figure class="video"><a class="video-box" href="https://youtu.be/${id}" data-video="${id}" data-title="${esc(title)}" rel="noopener">${poster ? `<img src="${poster}" alt="" width="1200" height="630">` : ''}${PLAY}<span class="sr">Play video: ${esc(title)}</span></a><figcaption>Pressing play loads the video from YouTube. <a href="https://youtu.be/${id}" rel="noopener" target="_blank">Watch it on YouTube instead</a>.</figcaption></figure>`;
+}
+const withVideos = html => html.replace(/\{\{youtube:([\w-]+)\|([^}]+)\}\}/g, (_, id, t) => videoHtml(id, t.trim(), null));
+
 // ---------- markdown (the small subset we use) ----------
 function inline(t) {
   t = esc(t);
@@ -73,7 +84,11 @@ function markdown(src) {
   for (const block of src.replace(/\r\n/g, '\n').trim().split(/\n{2,}/)) {
     const lines = block.split('\n');
     const first = lines[0];
-    if (/^---+$/.test(block.trim())) out.push('<hr>');
+    const vid = block.trim().match(/^\{\{youtube:([\w-]+)\|([^}]+)\}\}$/);
+    const img = block.trim().match(/^!\[([^\]]*)\]\((\S+?)(?: "(\d+)x(\d+)")?\)$/);
+    if (vid) out.push(videoHtml(vid[1], vid[2].trim(), null));
+    else if (img) out.push(`<figure class="post-figure"><img src="${img[2]}" alt="${esc(img[1])}"${img[3] ? ` width="${img[3]}" height="${img[4]}"` : ''} loading="lazy"></figure>`);
+    else if (/^---+$/.test(block.trim())) out.push('<hr>');
     else if (/^### /.test(first)) out.push(`<h3>${inline(first.slice(4))}</h3>`);
     else if (/^## /.test(first)) {
       const t = first.slice(3);
@@ -94,24 +109,27 @@ function readPost(file) {
   const meta = {};
   for (const line of m[1].split('\n')) {
     const k = line.match(/^([a-z_]+):\s*(.*)$/);
-    if (k) meta[k[1]] = k[2].trim();
+    if (k) meta[k[1]] = k[2].trim().replace(/^"(.*)"$/, '$1');
   }
   const slug = path.basename(file).replace(/\.(md|html)$/, '');
   const name = path.relative(repo, file);
   for (const req of ['title', 'tag', 'description']) if (!meta[req]) fail(`${name} is missing "${req}:" in its header.`);
   if (meta.date && !/^\d{4}-\d{2}-\d{2}$/.test(meta.date)) fail(`${name}: date must look like 2025-07-18.`);
-  const body = file.endsWith('.html') ? m[2].trim() : markdown(m[2]);
+  const body = file.endsWith('.html') ? withVideos(m[2].trim()) : markdown(m[2]);
   const check = meta.title + ' ' + (meta.subtitle || '') + ' ' + meta.description + ' ' + (meta.excerpt || '') + ' ' + plain(body);
   if (/[—–]/.test(check)) fail(`${name} contains a long dash. Use a hyphen or reword (house style).`);
   if (/ICANN/.test(check)) fail(`${name} says "ICANN". The brand is spelled "iCan" / "iCan Thinking".`);
   if (meta.image) for (const ext of ['svg', 'png']) if (!fs.existsSync(path.join(PUBLIC, 'assets', 'img', 'blog', `${meta.image}.${ext}`))) fail(`${name}: image "${meta.image}.${ext}" not found in public/assets/img/blog/.`);
   if (meta.image && !meta.image_alt) fail(`${name}: add an image_alt: line describing the image.`);
+  if (meta.video && !meta.video_title) fail(`${name}: add a video_title: line.`);
+  if (meta.video && !meta.image) fail(`${name}: a video needs an image: to use as its cover.`);
   const words = plain(body).split(/\s+/).length;
   return {
     slug, body, words,
     title: meta.title, subtitle: meta.subtitle || '', date: meta.date || '', tag: meta.tag,
     description: meta.description, excerpt: meta.excerpt || meta.description,
-    image: meta.image || '', imageAlt: meta.image_alt || '',
+    image: meta.image || '', imageAlt: meta.image_alt || '', video: meta.video || '', videoTitle: meta.video_title || '', note: meta.note || '',
+    hasVideo: !!meta.video || body.includes('class="video"'),
     byline: meta.byline || 'By Marcus Thomlinson',
     disclaimer: meta.disclaimer === 'true', authorBox: meta.author_box !== 'false',
     mins: Math.max(1, Math.round(words / 200)),
@@ -153,9 +171,16 @@ const cssDir = path.join(PUBLIC, 'assets', 'css');
 for (const f of fs.readdirSync(cssDir)) if (/^blog\.[a-f0-9]+\.css$/.test(f)) fs.unlinkSync(path.join(cssDir, f));
 fs.writeFileSync(path.join(cssDir, `blog.${hash}.css`), css);
 const blogCss = `<link rel="stylesheet" href="/assets/css/blog.${hash}.css">`;
+// small script for click-to-play videos (only added to pages that have a video)
+const js = fs.readFileSync(path.join(repo, 'scripts', 'blog.js'), 'utf8');
+const jhash = crypto.createHash('sha1').update(js).digest('hex').slice(0, 10);
+const jsDir = path.join(PUBLIC, 'assets', 'js');
+for (const f of fs.readdirSync(jsDir)) if (/^blog\.[a-f0-9]+\.js$/.test(f)) fs.unlinkSync(path.join(jsDir, f));
+fs.writeFileSync(path.join(jsDir, `blog.${jhash}.js`), js);
+const blogJs = `<script src="/assets/js/blog.${jhash}.js" defer></script>`;
 
 // ---------- 3. page templates ----------
-function page({ title, description, url, bodyHtml, jsonld, ogType, ogImage = '/assets/img/og-image.png' }) {
+function page({ title, description, url, bodyHtml, jsonld, ogType, ogImage = '/assets/img/og-image.png', video = false }) {
   return `<!doctype html>
 <html lang="en-GB">
 <head>
@@ -195,6 +220,7 @@ ${bodyHtml}
 </main>
 ${footer}
 ${siteJs || ''}
+${video ? blogJs : ''}
 </body>
 </html>
 `;
@@ -229,8 +255,9 @@ ${p.subtitle ? `<p class="sub">${esc(p.subtitle)}</p>` : ''}
 <ul class="meta">${meta}</ul>
 </div></section>
 <section class="sec"><div class="wrap blog-wrap"><article class="post">
-${p.image ? `<figure class="post-hero"><img src="/assets/img/blog/${p.image}.svg" alt="${esc(p.imageAlt)}" width="1200" height="630"></figure>` : ''}
+${p.video ? videoHtml(p.video, p.videoTitle, `/assets/img/blog/${p.image}.svg`) : p.image ? `<figure class="post-hero"><img src="/assets/img/blog/${p.image}.svg" alt="${esc(p.imageAlt)}" width="1200" height="630"></figure>` : ''}
 ${p.body}
+${p.note ? `<aside class="post-note">${esc(p.note)}</aside>` : ''}
 ${p.disclaimer ? `<aside class="post-note"><strong>A quick note:</strong> ${esc(DISCLAIMER.replace(/^This post is for general information and inspiration\. /, 'this post is for general information and inspiration. '))}</aside>` : ''}
 ${cta}
 ${p.authorBox ? author : ''}
@@ -259,7 +286,7 @@ ${others.length ? `<section class="sec alt"><div class="wrap"><h2>More from the 
   };
   const dir = path.join(blogDir, p.slug);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'index.html'), page({ title: `${p.title} | iCan Thinking`, description: p.description, url, bodyHtml, jsonld, ogType: 'article', ogImage: p.image ? `/assets/img/blog/${p.image}.png` : undefined }));
+  fs.writeFileSync(path.join(dir, 'index.html'), page({ title: `${p.title} | iCan Thinking`, description: p.description, url, bodyHtml, jsonld, ogType: 'article', ogImage: p.image ? `/assets/img/blog/${p.image}.png` : undefined, video: p.hasVideo }));
 }
 
 const indexBody = `<section class="band blog-hero"><div class="wrap">
