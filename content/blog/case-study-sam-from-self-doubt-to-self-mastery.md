@@ -6,7 +6,7 @@ description: Sam felt stuck between versions of himself. Through steady mindset 
 byline: A client case study
 note: Shared with Sam's permission. Every person's journey is different, and this story is not a promise of any particular result.
 image: case-study-sam-from-self-doubt-to-self-mastery
-image_alt: A microphone in a spotlight above glowing sound bars
+image_alt: A man sitting thoughtfully in a leather armchair in a dark room
 ---
 When Sam first began his coaching journey earlier this year, he described himself as feeling "stuck between versions of me." He had a successful career and strong creative passions, yet something was holding him back. His confidence would fluctuate, his social energy came and went in waves, and despite glimpses of clarity, he often felt unsure about where he was heading next. Over the months that followed, Sam went through one of the most authentic transformations I've seen as a coach, not through dramatic overnight change but through steady, self-aware evolution.
 

@@ -119,7 +119,7 @@ function readPost(file) {
   const check = meta.title + ' ' + (meta.subtitle || '') + ' ' + meta.description + ' ' + (meta.excerpt || '') + ' ' + plain(body);
   if (/[—–]/.test(check)) fail(`${name} contains a long dash. Use a hyphen or reword (house style).`);
   if (/ICANN/.test(check)) fail(`${name} says "ICANN". The brand is spelled "iCan" / "iCan Thinking".`);
-  if (meta.image) for (const ext of ['svg', 'png']) if (!fs.existsSync(path.join(PUBLIC, 'assets', 'img', 'blog', `${meta.image}.${ext}`))) fail(`${name}: image "${meta.image}.${ext}" not found in public/assets/img/blog/.`);
+  if (meta.image) { const has = e => fs.existsSync(path.join(PUBLIC, 'assets', 'img', 'blog', `${meta.image}.${e}`)); if (!has('jpg') && !(has('svg') && has('png'))) fail(`${name}: image "${meta.image}" not found in public/assets/img/blog/ (add a 1200x630 .jpg photo, or an .svg plus a .png).`); }
   if (meta.image && !meta.image_alt) fail(`${name}: add an image_alt: line describing the image.`);
   if (meta.video && !meta.video_title) fail(`${name}: add a video_title: line.`);
   if (meta.video && !meta.image) fail(`${name}: a video needs an image: to use as its cover.`);
@@ -226,7 +226,9 @@ ${video ? blogJs : ''}
 `;
 }
 
-const cardHtml = p => `<li><a class="blog-card" href="/blog/${p.slug}/">${p.image ? `<img class="blog-card-img" src="/assets/img/blog/${p.image}.svg" alt="" width="1200" height="630" loading="lazy">` : ''}<span class="tag">${esc(p.tag)}</span><h3>${esc(p.title)}</h3><p>${esc(p.excerpt)}</p><span class="foot"><span>${p.date ? fmtDate(p.date) : 'From the archive'}</span><span>${p.mins} min read</span><span class="go">Read more &rarr;</span></span></a></li>`;
+const imgExt = n => fs.existsSync(path.join(PUBLIC, 'assets', 'img', 'blog', `${n}.jpg`)) ? 'jpg' : 'svg';
+const ogExt = n => fs.existsSync(path.join(PUBLIC, 'assets', 'img', 'blog', `${n}.jpg`)) ? 'jpg' : 'png';
+const cardHtml = p => `<li><a class="blog-card" href="/blog/${p.slug}/">${p.image ? `<img class="blog-card-img" src="/assets/img/blog/${p.image}.${imgExt(p.image)}" alt="" width="1200" height="630" loading="lazy">` : ''}<span class="tag">${esc(p.tag)}</span><h3>${esc(p.title)}</h3><p>${esc(p.excerpt)}</p><span class="foot"><span>${p.date ? fmtDate(p.date) : 'From the archive'}</span><span>${p.mins} min read</span><span class="go">Read more &rarr;</span></span></a></li>`;
 
 const showFounding = TODAY < FOUNDING_ENDS;
 const cta = `<aside class="blog-cta" aria-labelledby="cta-title">
@@ -255,7 +257,7 @@ ${p.subtitle ? `<p class="sub">${esc(p.subtitle)}</p>` : ''}
 <ul class="meta">${meta}</ul>
 </div></section>
 <section class="sec"><div class="wrap blog-wrap"><article class="post">
-${p.video ? videoHtml(p.video, p.videoTitle, `/assets/img/blog/${p.image}.svg`) : p.image ? `<figure class="post-hero"><img src="/assets/img/blog/${p.image}.svg" alt="${esc(p.imageAlt)}" width="1200" height="630"></figure>` : ''}
+${p.video ? videoHtml(p.video, p.videoTitle, `/assets/img/blog/${p.image}.${imgExt(p.image)}`) : p.image ? `<figure class="post-hero"><img src="/assets/img/blog/${p.image}.${imgExt(p.image)}" alt="${esc(p.imageAlt)}" width="1200" height="630"></figure>` : ''}
 ${p.body}
 ${p.note ? `<aside class="post-note">${esc(p.note)}</aside>` : ''}
 ${p.disclaimer ? `<aside class="post-note"><strong>A quick note:</strong> ${esc(DISCLAIMER.replace(/^This post is for general information and inspiration\. /, 'this post is for general information and inspiration. '))}</aside>` : ''}
@@ -272,7 +274,7 @@ ${others.length ? `<section class="sec alt"><div class="wrap"><h2>More from the 
         ...(p.date ? { datePublished: p.date } : {}),
         author: { '@type': 'Person', '@id': `${SITE}/about-marcus/#marcus`, name: 'Marcus Thomlinson' },
         publisher: { '@id': `${SITE}/#organization` },
-        image: `${SITE}${p.image ? `/assets/img/blog/${p.image}.png` : '/assets/img/og-image.png'}`,
+        image: `${SITE}${p.image ? `/assets/img/blog/${p.image}.${ogExt(p.image)}` : '/assets/img/og-image.png'}`,
       },
       {
         '@type': 'BreadcrumbList',
@@ -286,7 +288,7 @@ ${others.length ? `<section class="sec alt"><div class="wrap"><h2>More from the 
   };
   const dir = path.join(blogDir, p.slug);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'index.html'), page({ title: `${p.title} | iCan Thinking`, description: p.description, url, bodyHtml, jsonld, ogType: 'article', ogImage: p.image ? `/assets/img/blog/${p.image}.png` : undefined, video: p.hasVideo }));
+  fs.writeFileSync(path.join(dir, 'index.html'), page({ title: `${p.title} | iCan Thinking`, description: p.description, url, bodyHtml, jsonld, ogType: 'article', ogImage: p.image ? `/assets/img/blog/${p.image}.${ogExt(p.image)}` : undefined, video: p.hasVideo }));
 }
 
 const indexBody = `<section class="band blog-hero"><div class="wrap">

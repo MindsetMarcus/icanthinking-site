@@ -4,7 +4,7 @@ subtitle: A step-by-step video, plus why a cloud back-up matters
 tag: Business tips
 description: Watch how to add multiple OneDrive accounts to an Apple Mac, so all your files are on your local drive and easy to back up off-line.
 image: how-to-add-multiple-onedrive-accounts-to-a-mac
-image_alt: A laptop with two folders, connected to two clouds
+image_alt: A hand on a laptop trackpad with a wristwatch visible
 video: 9Wuc8qTUxUA
 video_title: How to add multiple OneDrive accounts to a Mac
 ---

@@ -7,7 +7,7 @@ description: Your phone is needy, demanding and designed to grab your attention.
 byline: By John Shelton, associate coach
 author_box: false
 image: do-you-have-a-controlling-partner
-image_alt: A calm phone home screen with just a few apps while red notification bubbles drift away
+image_alt: A man peering anxiously through window blinds
 ---
 Do you have a controlling partner? One who is very needy and demanding of your time? I know I do. Chances are that you do too, without realising it.
 

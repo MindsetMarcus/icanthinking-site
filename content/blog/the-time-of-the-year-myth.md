@@ -4,7 +4,7 @@ subtitle: Perception is reality
 tag: Sales mindset
 description: "It's the wrong time of year" is only true if you believe it. A true story of a December that was supposed to be the worst month and became the best.
 image: the-time-of-the-year-myth
-image_alt: A calendar of twelve months with December glowing gold
+image_alt: A building wall with the words Time is precious in neon letters
 ---
 Have you ever read a post on LinkedIn which reminded you of how we often buy into things that are only as true as we make them? Your mindset is everything. I'm referring to sales or marketing myths, when we create our own barriers to success, but this mindset can apply to many aspects of life.
 
