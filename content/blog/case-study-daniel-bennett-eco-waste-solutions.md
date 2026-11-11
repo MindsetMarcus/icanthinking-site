@@ -7,7 +7,7 @@ description: In twelve months Daniel Bennett took Eco Waste Solutions from one-m
 byline: A client case study
 note: Shared with Daniel's permission. Results are specific to Daniel and his business and are not a guarantee of what any other business will achieve.
 image: case-study-daniel-bennett-eco-waste-solutions
-image_alt: A green recycling loop with a leaf beside a rising gold bar chart
+image_alt: A wooden jetty stretching out over calm water at sunrise
 ---
 When Daniel Bennett began his coaching journey with me a year ago, Eco Waste Solutions was a promising but demanding venture. Like many business owners juggling rapid growth with personal and operational pressures, Daniel was stretched to his limits. His days were long, his evenings were filled with paperwork, and his head was constantly full of competing priorities such as managing clients, organising crews, chasing invoices, and trying to stay motivated while navigating complex personal challenges.
 

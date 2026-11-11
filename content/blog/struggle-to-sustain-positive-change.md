@@ -4,7 +4,7 @@ subtitle: Three keys to making change last
 tag: Mindset
 description: Most people struggle to keep positive change going. Change your mindset first, then break the habit, with consistency, repetition and accountability.
 image: struggle-to-sustain-positive-change
-image_alt: A staircase of rising steps with three keys above it and a glowing dot at the top
+image_alt: An arrow painted on a city road pointing forward at night
 ---
 Do you struggle to sustain positive change? Most people do. Think of people who join a gym in January. They are super keen for six weeks, then something gets in the way, then activity goes back to little or nothing.
 
