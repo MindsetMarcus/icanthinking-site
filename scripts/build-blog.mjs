@@ -151,7 +151,7 @@ for (const f of walk(PUBLIC).filter(f => f.endsWith('.html'))) {
   if (f.startsWith(path.join(PUBLIC, 'blog') + path.sep)) continue;
   let t = fs.readFileSync(f, 'utf8');
   let n = t;
-  if (!/<nav aria-label="Main">[^]*?href="\/blog\/"/.test(n)) n = n.replace(/(<nav aria-label="Main">[^]*?)(<a href="\/about-marcus\/">About Marcus<\/a>)/, `$1${NAV_LINK}$2`);
+  if (!/<nav aria-label="Main">(?:(?!<\/nav>)[^])*?href="\/blog\/"/.test(n)) n = n.replace(/(<nav aria-label="Main">[^]*?)(<a href="\/about-marcus\/">About Marcus<\/a>)/, `$1${NAV_LINK}$2`);
   if (!/<h4>Company<\/h4><ul>[^]*?href="\/blog\/"/.test(n)) n = n.replace(/(<h4>Company<\/h4><ul>[^]*?)(<li><a href="\/reviews\/">Reviews<\/a><\/li>)/, `$1$2${FOOT_LINK}`);
   if (n !== t) { fs.writeFileSync(f, n); patched++; }
 }
